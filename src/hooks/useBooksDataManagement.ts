@@ -477,6 +477,31 @@ export function useBooksDataManagement(organizationId: string | null, isConnecte
     }
   };
 
+  const handleUpdateExpense = async (expenseId: string, updates: Partial<Expense>) => {
+    if (!user?.id || !organizationId) return;
+    try {
+      console.log('📝 Updating expense:', { expenseId, updates });
+      await updateExpense(user.id, organizationId, expenseId, {
+        amount: updates.amount,
+        reference_number: updates.reference_number,
+        customer_name: updates.customer_name,
+        expense_date: updates.expense_date,
+      });
+      addToast('Expense updated successfully!', 'success');
+      await loadExpensesData();
+      // Update selectedExpense if it's the one being edited
+      if (selectedExpense?.expense_id === expenseId) {
+        setSelectedExpense({
+          ...selectedExpense,
+          ...updates,
+        });
+      }
+    } catch (error) {
+      console.error('Error updating expense:', error);
+      addToast('Failed to update expense', 'error');
+    }
+  };
+
   const handleDeleteExpense = async (expenseId: string) => {
     if (!user?.id || !organizationId) return;
     if (!window.confirm('Are you sure you want to delete this expense? This action cannot be undone.')) {
@@ -504,7 +529,24 @@ export function useBooksDataManagement(organizationId: string | null, isConnecte
       await loadCustomersData();
     } catch (error) {
       console.error('Error deleting customer:', error);
-      addToast('Failed to delete customer', 'error');
+      let errorMsg = 'Failed to delete customer';
+
+      if (error instanceof Error) {
+        try {
+          const parsed = JSON.parse(error.message);
+          if (parsed.message) {
+            errorMsg = `Delete failed: ${parsed.message}`;
+          } else if (parsed.status === 403) {
+            errorMsg = 'Permission denied. Customer may be linked to active transactions.';
+          } else if (parsed.status === 404) {
+            errorMsg = 'Customer not found in Zoho Books.';
+          }
+        } catch (e) {
+          errorMsg = `Delete error: ${error.message}`;
+        }
+      }
+
+      addToast(errorMsg, 'error');
     }
   };
 
@@ -519,7 +561,24 @@ export function useBooksDataManagement(organizationId: string | null, isConnecte
       await loadVendorsData();
     } catch (error) {
       console.error('Error deleting vendor:', error);
-      addToast('Failed to delete vendor', 'error');
+      let errorMsg = 'Failed to delete vendor';
+
+      if (error instanceof Error) {
+        try {
+          const parsed = JSON.parse(error.message);
+          if (parsed.message) {
+            errorMsg = `Delete failed: ${parsed.message}`;
+          } else if (parsed.status === 403) {
+            errorMsg = 'Permission denied. Vendor may be linked to active transactions.';
+          } else if (parsed.status === 404) {
+            errorMsg = 'Vendor not found in Zoho Books.';
+          }
+        } catch (e) {
+          errorMsg = `Delete error: ${error.message}`;
+        }
+      }
+
+      addToast(errorMsg, 'error');
     }
   };
 
@@ -556,6 +615,7 @@ export function useBooksDataManagement(organizationId: string | null, isConnecte
     handleCreateVendor,
     handleCreateExpense,
     handleViewExpense,
+    handleUpdateExpense,
     handleDeleteExpense,
     handleDeleteCustomer,
     handleDeleteVendor,

@@ -63,6 +63,7 @@ export default function Books() {
     handleCreateVendor: createVendorHandler,
     handleCreateExpense: createExpenseHandler,
     handleViewExpense: viewExpenseHandler,
+    handleUpdateExpense: updateExpenseHandler,
     handleDeleteExpense: deleteExpenseHandler,
     handleDeleteCustomer: deleteCustomerHandler,
     handleDeleteVendor: deleteVendorHandler,
@@ -314,6 +315,9 @@ export default function Books() {
             invoices={invoices}
             isLoading={loadingInvoices}
             onNewClick={() => setShowNewInvoiceModal(true)}
+            onView={(invoiceId) => console.log('View invoice:', invoiceId)}
+            onEdit={(invoiceId) => console.log('Edit invoice:', invoiceId)}
+            onDelete={(invoiceId) => console.log('Delete invoice:', invoiceId)}
           />
         )}
 
@@ -324,6 +328,8 @@ export default function Books() {
             isLoading={loadingCustomers}
             onNewClick={() => setShowNewCustomerModal(true)}
             onDelete={deleteCustomerHandler}
+            onView={(customer) => console.log('View customer:', customer)}
+            onEdit={(customer) => console.log('Edit customer:', customer)}
           />
         )}
 
@@ -334,6 +340,8 @@ export default function Books() {
             isLoading={loadingVendors}
             onNewClick={() => setShowNewVendorModal(true)}
             onDelete={deleteVendorHandler}
+            onView={(vendor) => console.log('View vendor:', vendor)}
+            onEdit={(vendor) => console.log('Edit vendor:', vendor)}
           />
         )}
 
@@ -344,8 +352,18 @@ export default function Books() {
             isLoading={loadingExpenses}
             currency={currency}
             onNewClick={() => setShowNewExpenseModal(true)}
-            onView={handleViewExpense}
-            onDelete={handleDeleteExpense}
+            onView={(expenseId) => {
+              viewExpenseHandler(expenseId, currency);
+              setShowExpenseDetailModal(true);
+            }}
+            onEdit={(expenseId) => {
+              const expense = expenses.find(e => e.expense_id === expenseId);
+              if (expense) {
+                setSelectedExpense(expense);
+                setShowExpenseDetailModal(true);
+              }
+            }}
+            onDelete={deleteExpenseHandler}
           />
         )}
 
@@ -413,6 +431,7 @@ export default function Books() {
           expense={selectedExpense}
           currencyDefault={currency}
           onDelete={deleteExpenseHandler}
+          onUpdate={updateExpenseHandler}
         />
       </div>
     </div>

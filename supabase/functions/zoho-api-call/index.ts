@@ -168,12 +168,21 @@ Deno.serve(async (req) => {
         errorMessage = responseText || response.statusText;
         console.error(`🔴 Failed to parse error response: ${errorMessage}`);
       }
-      throw new Error(JSON.stringify({
-        status: response.status,
-        message: errorMessage,
-        code: errorCode,
-        fullError: fullErrorData,
-      }));
+
+      // Return error response with detailed information
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: errorMessage,
+          code: errorCode,
+          httpStatus: response.status,
+          details: fullErrorData,
+        }),
+        {
+          status: 200, // Return 200 so Supabase treats it as successful function execution
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     let data;

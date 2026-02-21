@@ -74,6 +74,7 @@ export default function ExpensesTab({
               {expenses.map((expense) => (
                 <tr key={expense.expense_id} className="hover:bg-white/5 transition-colors">
                   <td className="px-3 py-3 text-white">{expense.vendor_name}</td>
+                  <td className="px-3 py-3 text-gray-300">{expense.customer_name || '-'}</td>
                   <td className="px-3 py-3 text-white font-semibold">
                     {currency} {expense.amount.toFixed(2)}
                   </td>
@@ -93,6 +94,15 @@ export default function ExpensesTab({
                     >
                       <Eye className="w-4 h-4 text-gray-400" />
                     </button>
+                    {onEdit && (
+                      <button
+                        onClick={() => onEdit(expense.expense_id)}
+                        className="p-2 hover:bg-white/10 rounded transition-colors"
+                        title="Edit"
+                      >
+                        <Edit2 className="w-4 h-4 text-gray-400" />
+                      </button>
+                    )}
                     <button
                       onClick={() => onDelete(expense.expense_id)}
                       className="p-2 hover:bg-white/10 rounded transition-colors"

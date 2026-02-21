@@ -173,7 +173,19 @@ export const zohoBooksApiCall = async (
 
     if (!data?.success) {
       let errorMsg = data?.error || 'API call failed';
+      const errorStatus = data?.status || 500;
       const details = data?.details || '';
+
+      // Provide specific error messages based on status code
+      if (errorStatus === 403) {
+        errorMsg = 'Permission denied. This item may be linked to active transactions and cannot be deleted.';
+      } else if (errorStatus === 404) {
+        errorMsg = 'Item not found in Zoho Books. It may have already been deleted.';
+      } else if (errorStatus === 400) {
+        errorMsg = 'Invalid request. Please check the item details.';
+      } else if (errorStatus === 401) {
+        errorMsg = 'Authorization failed. Please reconnect to Zoho Books.';
+      }
 
       // Try to parse the error message if it's a JSON string
       try {
@@ -187,6 +199,7 @@ export const zohoBooksApiCall = async (
       }
 
       console.error('🔴 API call not successful:', errorMsg);
+      console.error('🔴 Status:', errorStatus);
       if (details) console.error('🔴 Details:', details);
       throw new Error(errorMsg);
     }
