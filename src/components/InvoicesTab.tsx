@@ -15,9 +15,12 @@ interface InvoicesTabProps {
   invoices: Invoice[];
   isLoading: boolean;
   onNewClick: () => void;
+  onView?: (invoiceId: string) => void;
+  onEdit?: (invoiceId: string) => void;
+  onDelete?: (invoiceId: string) => void;
 }
 
-export default function InvoicesTab({ invoices, isLoading, onNewClick }: InvoicesTabProps) {
+export default function InvoicesTab({ invoices, isLoading, onNewClick, onView, onEdit, onDelete }: InvoicesTabProps) {
   return (
     <div className="space-y-6">
       <button
@@ -72,13 +75,25 @@ export default function InvoicesTab({ invoices, isLoading, onNewClick }: Invoice
                   </td>
                   <td className="px-6 py-3 text-gray-300">{new Date(invoice.due_date).toLocaleDateString()}</td>
                   <td className="px-6 py-3 flex gap-2">
-                    <button className="p-2 hover:bg-white/10 rounded transition-colors">
+                    <button
+                      onClick={() => onView?.(invoice.invoice_id)}
+                      className="p-2 hover:bg-white/10 rounded transition-colors"
+                      title="View invoice"
+                    >
                       <Eye className="w-4 h-4 text-gray-400" />
                     </button>
-                    <button className="p-2 hover:bg-white/10 rounded transition-colors">
+                    <button
+                      onClick={() => onEdit?.(invoice.invoice_id)}
+                      className="p-2 hover:bg-white/10 rounded transition-colors"
+                      title="Edit invoice"
+                    >
                       <Edit2 className="w-4 h-4 text-gray-400" />
                     </button>
-                    <button className="p-2 hover:bg-white/10 rounded transition-colors">
+                    <button
+                      onClick={() => onDelete?.(invoice.invoice_id)}
+                      className="p-2 hover:bg-white/10 rounded transition-colors"
+                      title="Delete invoice"
+                    >
                       <Trash2 className="w-4 h-4 text-red-400" />
                     </button>
                   </td>

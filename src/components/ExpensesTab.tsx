@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, TrendingUp, Eye, Trash2, Zap } from 'lucide-react';
+import { Plus, TrendingUp, Eye, Edit2, Trash2, Zap } from 'lucide-react';
 
 interface Expense {
   expense_id: string;
@@ -22,6 +22,7 @@ interface ExpensesTabProps {
   currency: string;
   onNewClick: () => void;
   onView: (expenseId: string) => Promise<void>;
+  onEdit?: (expenseId: string) => Promise<void>;
   onDelete: (expenseId: string) => Promise<void>;
 }
 
@@ -31,6 +32,7 @@ export default function ExpensesTab({
   currency,
   onNewClick,
   onView,
+  onEdit,
   onDelete,
 }: ExpensesTabProps) {
   return (
@@ -59,6 +61,7 @@ export default function ExpensesTab({
             <thead className="bg-white/10 border-b border-white/10">
               <tr>
                 <th className="px-3 py-3 text-left text-white font-semibold">Vendor</th>
+                <th className="px-3 py-3 text-left text-white font-semibold">Customer</th>
                 <th className="px-3 py-3 text-left text-white font-semibold">Amount</th>
                 <th className="px-3 py-3 text-left text-white font-semibold">Ref #</th>
                 <th className="px-3 py-3 text-left text-white font-semibold">Account</th>

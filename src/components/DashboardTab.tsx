@@ -1,4 +1,5 @@
 import React from 'react';
+import { Receipt, Users, CreditCard, BarChart4 } from 'lucide-react';
 
 interface Invoice {
   invoice_id: string;
@@ -44,9 +45,7 @@ export default function DashboardTab({ invoices, customers, expenses }: Dashboar
               <p className="text-gray-400 text-sm mb-2">Total Invoices</p>
               <p className="text-3xl font-bold text-white">{invoices.length}</p>
             </div>
-            <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
+            <Receipt className="w-8 h-8 text-blue-400" />
           </div>
         </div>
 
@@ -56,9 +55,7 @@ export default function DashboardTab({ invoices, customers, expenses }: Dashboar
               <p className="text-gray-400 text-sm mb-2">Customers</p>
               <p className="text-3xl font-bold text-white">{customers.length}</p>
             </div>
-            <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 12H9m6 0a6 6 0 11-12 0 6 6 0 0112 0z" />
-            </svg>
+            <Users className="w-8 h-8 text-emerald-400" />
           </div>
         </div>
 
@@ -70,9 +67,7 @@ export default function DashboardTab({ invoices, customers, expenses }: Dashboar
                 ${totalExpenses.toFixed(2)}
               </p>
             </div>
-            <svg className="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-            </svg>
+            <CreditCard className="w-8 h-8 text-orange-400" />
           </div>
         </div>
 
@@ -82,9 +77,7 @@ export default function DashboardTab({ invoices, customers, expenses }: Dashboar
               <p className="text-gray-400 text-sm mb-2">Reports</p>
               <p className="text-3xl font-bold text-white">Ready</p>
             </div>
-            <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
+            <BarChart4 className="w-8 h-8 text-purple-400" />
           </div>
         </div>
       </div>
