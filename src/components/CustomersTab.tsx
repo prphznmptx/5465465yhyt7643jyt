@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Users, Mail, Phone, Trash2, Zap, Eye, Edit2 } from 'lucide-react';
+import CustomerDetailModal from './CustomerDetailModal';
 
 interface Customer {
   contact_id: string;
@@ -14,13 +15,22 @@ interface CustomersTabProps {
   isLoading: boolean;
   onNewClick: () => void;
   onDelete: (customerId: string) => Promise<void>;
-  onView?: (customer: Customer) => void;
-  onEdit?: (customer: Customer) => void;
+  onView?: (customerId: string) => Promise<void>;
+  onUpdate?: (customerId: string, data: Partial<Customer>) => Promise<void>;
 }
 
-export default function CustomersTab({ customers, isLoading, onNewClick, onDelete, onView, onEdit }: CustomersTabProps) {
+export default function CustomersTab({ customers, isLoading, onNewClick, onDelete, onView, onUpdate }: CustomersTabProps) {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+
+  const handleViewCustomer = async (customer: Customer) => {
+    if (onView) {
+      await onView(customer.contact_id);
+    }
+    setSelectedCustomer(customer);
+    setShowDetailModal(true);
+  };
+
   return (
     <div className="space-y-6">
       <button
@@ -52,29 +62,11 @@ export default function CustomersTab({ customers, isLoading, onNewClick, onDelet
                 </div>
                 <div className="flex gap-1">
                   <button
-                    onClick={() => {
-                      setSelectedCustomer(customer);
-                      setShowDetailModal(true);
-                      onView?.(customer);
-                    }}
+                    onClick={() => handleViewCustomer(customer)}
                     className="p-2 hover:bg-white/10 rounded transition-colors"
                     title="View customer"
                   >
                     <Eye className="w-4 h-4 text-gray-400" />
-                  </button>
-                  <button
-                    onClick={() => onEdit?.(customer)}
-                    className="p-2 hover:bg-white/10 rounded transition-colors"
-                    title="Edit customer"
-                  >
-                    <Edit2 className="w-4 h-4 text-gray-400" />
-                  </button>
-                  <button
-                    onClick={() => onDelete(customer.contact_id)}
-                    className="p-2 hover:bg-white/10 rounded transition-colors"
-                    title="Delete customer"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-400" />
                   </button>
                 </div>
               </div>
@@ -95,60 +87,16 @@ export default function CustomersTab({ customers, isLoading, onNewClick, onDelet
         </div>
       )}
 
-      {/* Customer Detail Modal */}
-      {showDetailModal && selectedCustomer && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 rounded-xl border border-white/10 w-full max-w-lg">
-            <div className="p-6 border-b border-white/10 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-white">Customer Details</h3>
-              <button
-                onClick={() => {
-                  setShowDetailModal(false);
-                  setSelectedCustomer(null);
-                }}
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="text-gray-400 text-sm">Name</label>
-                <p className="text-white font-medium">{selectedCustomer.contact_name}</p>
-              </div>
-              {selectedCustomer.company_name && (
-                <div>
-                  <label className="text-gray-400 text-sm">Company</label>
-                  <p className="text-white">{selectedCustomer.company_name}</p>
-                </div>
-              )}
-              {selectedCustomer.email && (
-                <div>
-                  <label className="text-gray-400 text-sm">Email</label>
-                  <p className="text-white">{selectedCustomer.email}</p>
-                </div>
-              )}
-              {selectedCustomer.phone && (
-                <div>
-                  <label className="text-gray-400 text-sm">Phone</label>
-                  <p className="text-white">{selectedCustomer.phone}</p>
-                </div>
-              )}
-              <div className="flex gap-3 pt-4 border-t border-white/10">
-                <button
-                  onClick={() => {
-                    setShowDetailModal(false);
-                    setSelectedCustomer(null);
-                  }}
-                  className="flex-1 px-4 py-2 bg-white/10 text-gray-300 rounded-lg hover:bg-white/20 transition-colors font-medium"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <CustomerDetailModal
+        isOpen={showDetailModal}
+        onClose={() => {
+          setShowDetailModal(false);
+          setSelectedCustomer(null);
+        }}
+        customer={selectedCustomer}
+        onDelete={onDelete}
+        onUpdate={onUpdate}
+      />
     </div>
   );
 }

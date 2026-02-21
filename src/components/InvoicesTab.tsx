@@ -1,26 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus, FileText, CheckCircle2, AlertCircle, Mail, Clock, Eye, Edit2, Trash2, Zap } from 'lucide-react';
+import InvoiceDetailModal from './InvoiceDetailModal';
 
 interface Invoice {
   invoice_id: string;
   invoice_number: string;
   customer_name: string;
+  customer_id?: string;
   total: number;
   status: string;
   invoice_date: string;
   due_date: string;
+  notes?: string;
 }
 
 interface InvoicesTabProps {
   invoices: Invoice[];
   isLoading: boolean;
   onNewClick: () => void;
-  onView?: (invoiceId: string) => void;
-  onEdit?: (invoiceId: string) => void;
-  onDelete?: (invoiceId: string) => void;
+  onView?: (invoiceId: string) => Promise<void>;
+  onEdit?: (invoiceId: string) => Promise<void>;
+  onDelete?: (invoiceId: string) => Promise<void>;
+  onUpdate?: (invoiceId: string, data: Partial<Invoice>) => Promise<void>;
 }
 
-export default function InvoicesTab({ invoices, isLoading, onNewClick, onView, onEdit, onDelete }: InvoicesTabProps) {
+export default function InvoicesTab({ invoices, isLoading, onNewClick, onView, onEdit, onDelete, onUpdate }: InvoicesTabProps) {
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+
+  const handleViewInvoice = async (invoice: Invoice) => {
+    if (onView) {
+      await onView(invoice.invoice_id);
+    }
+    setSelectedInvoice(invoice);
+    setShowDetailModal(true);
+  };
+
   return (
     <div className="space-y-6">
       <button
@@ -76,25 +91,11 @@ export default function InvoicesTab({ invoices, isLoading, onNewClick, onView, o
                   <td className="px-6 py-3 text-gray-300">{new Date(invoice.due_date).toLocaleDateString()}</td>
                   <td className="px-6 py-3 flex gap-2">
                     <button
-                      onClick={() => onView?.(invoice.invoice_id)}
+                      onClick={() => handleViewInvoice(invoice)}
                       className="p-2 hover:bg-white/10 rounded transition-colors"
                       title="View invoice"
                     >
                       <Eye className="w-4 h-4 text-gray-400" />
-                    </button>
-                    <button
-                      onClick={() => onEdit?.(invoice.invoice_id)}
-                      className="p-2 hover:bg-white/10 rounded transition-colors"
-                      title="Edit invoice"
-                    >
-                      <Edit2 className="w-4 h-4 text-gray-400" />
-                    </button>
-                    <button
-                      onClick={() => onDelete?.(invoice.invoice_id)}
-                      className="p-2 hover:bg-white/10 rounded transition-colors"
-                      title="Delete invoice"
-                    >
-                      <Trash2 className="w-4 h-4 text-red-400" />
                     </button>
                   </td>
                 </tr>
@@ -103,6 +104,17 @@ export default function InvoicesTab({ invoices, isLoading, onNewClick, onView, o
           </table>
         </div>
       )}
+
+      <InvoiceDetailModal
+        isOpen={showDetailModal}
+        onClose={() => {
+          setShowDetailModal(false);
+          setSelectedInvoice(null);
+        }}
+        invoice={selectedInvoice}
+        onDelete={onDelete || (async () => {})}
+        onUpdate={onUpdate}
+      />
     </div>
   );
 }

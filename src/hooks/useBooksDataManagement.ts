@@ -17,16 +17,25 @@ import {
   deleteCustomer,
   deleteVendor,
   getExpenseAccounts,
+  getInvoice,
+  updateInvoice,
+  deleteInvoice,
+  getCustomer,
+  updateCustomer,
+  getVendor,
+  updateVendor,
 } from '../lib/zohoBooksService';
 
 interface Invoice {
   invoice_id: string;
   invoice_number: string;
   customer_name: string;
+  customer_id?: string;
   total: number;
   status: string;
   invoice_date: string;
   due_date: string;
+  notes?: string;
 }
 
 interface Customer {
@@ -71,6 +80,9 @@ export function useBooksDataManagement(organizationId: string | null, isConnecte
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [expenseAccounts, setExpenseAccounts] = useState<Array<{ account_id: string; account_name: string; account_type: string }>>([]);
   const [reports, setReports] = useState<any>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
 
   // Loading states
@@ -582,6 +594,155 @@ export function useBooksDataManagement(organizationId: string | null, isConnecte
     }
   };
 
+  // Invoice handlers
+  const handleViewInvoice = async (invoiceId: string) => {
+    if (!user?.id || !organizationId) return;
+    try {
+      const invoice = await getInvoice(user.id, organizationId, invoiceId);
+      const invoiceData = invoice?.invoice || invoice;
+      if (invoiceData) {
+        setSelectedInvoice({
+          invoice_id: invoiceData.invoice_id || invoiceId,
+          invoice_number: invoiceData.invoice_number || '',
+          customer_name: invoiceData.customer_name || '',
+          customer_id: invoiceData.customer_id,
+          total: invoiceData.total || 0,
+          status: invoiceData.status || '',
+          invoice_date: invoiceData.invoice_date || '',
+          due_date: invoiceData.due_date || '',
+          notes: invoiceData.notes,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching invoice:', error);
+      addToast('Failed to load invoice details', 'error');
+    }
+  };
+
+  const handleUpdateInvoice = async (invoiceId: string, updates: Partial<Invoice>) => {
+    if (!user?.id || !organizationId) return;
+    try {
+      await updateInvoice(user.id, organizationId, invoiceId, {
+        notes: updates.notes,
+      });
+      addToast('Invoice updated successfully!', 'success');
+      await loadInvoicesData();
+      if (selectedInvoice?.invoice_id === invoiceId) {
+        setSelectedInvoice({
+          ...selectedInvoice,
+          ...updates,
+        });
+      }
+    } catch (error) {
+      console.error('Error updating invoice:', error);
+      addToast('Failed to update invoice', 'error');
+    }
+  };
+
+  const handleDeleteInvoice = async (invoiceId: string) => {
+    if (!user?.id || !organizationId) return;
+    if (!window.confirm('Are you sure you want to delete this invoice? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      await deleteInvoice(user.id, organizationId, invoiceId);
+      addToast('Invoice deleted successfully!', 'success');
+      setSelectedInvoice(null);
+      await loadInvoicesData();
+    } catch (error) {
+      console.error('Error deleting invoice:', error);
+      addToast('Failed to delete invoice', 'error');
+    }
+  };
+
+  // Customer handlers
+  const handleViewCustomer = async (customerId: string) => {
+    if (!user?.id || !organizationId) return;
+    try {
+      const customer = await getCustomer(user.id, organizationId, customerId);
+      const customerData = customer?.contact || customer;
+      if (customerData) {
+        setSelectedCustomer({
+          contact_id: customerData.contact_id || customerId,
+          contact_name: customerData.contact_name || '',
+          email: customerData.email || '',
+          company_name: customerData.company_name,
+          phone: customerData.phone,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching customer:', error);
+      addToast('Failed to load customer details', 'error');
+    }
+  };
+
+  const handleUpdateCustomer = async (customerId: string, updates: Partial<Customer>) => {
+    if (!user?.id || !organizationId) return;
+    try {
+      await updateCustomer(user.id, organizationId, customerId, {
+        contact_name: updates.contact_name,
+        email: updates.email,
+        phone: updates.phone,
+        company_name: updates.company_name,
+      });
+      addToast('Customer updated successfully!', 'success');
+      await loadCustomersData();
+      if (selectedCustomer?.contact_id === customerId) {
+        setSelectedCustomer({
+          ...selectedCustomer,
+          ...updates,
+        });
+      }
+    } catch (error) {
+      console.error('Error updating customer:', error);
+      addToast('Failed to update customer', 'error');
+    }
+  };
+
+  // Vendor handlers
+  const handleViewVendor = async (vendorId: string) => {
+    if (!user?.id || !organizationId) return;
+    try {
+      const vendor = await getVendor(user.id, organizationId, vendorId);
+      const vendorData = vendor?.contact || vendor;
+      if (vendorData) {
+        setSelectedVendor({
+          contact_id: vendorData.contact_id || vendorId,
+          contact_name: vendorData.contact_name || '',
+          email: vendorData.email || '',
+          company_name: vendorData.company_name,
+          phone: vendorData.phone,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching vendor:', error);
+      addToast('Failed to load vendor details', 'error');
+    }
+  };
+
+  const handleUpdateVendor = async (vendorId: string, updates: Partial<Vendor>) => {
+    if (!user?.id || !organizationId) return;
+    try {
+      await updateVendor(user.id, organizationId, vendorId, {
+        contact_name: updates.contact_name,
+        email: updates.email,
+        phone: updates.phone,
+        company_name: updates.company_name,
+      });
+      addToast('Vendor updated successfully!', 'success');
+      await loadVendorsData();
+      if (selectedVendor?.contact_id === vendorId) {
+        setSelectedVendor({
+          ...selectedVendor,
+          ...updates,
+        });
+      }
+    } catch (error) {
+      console.error('Error updating vendor:', error);
+      addToast('Failed to update vendor', 'error');
+    }
+  };
+
   return {
     // Data
     invoices,
@@ -590,9 +751,15 @@ export function useBooksDataManagement(organizationId: string | null, isConnecte
     expenses,
     expenseAccounts,
     reports,
+    selectedInvoice,
+    setSelectedInvoice,
+    selectedCustomer,
+    setSelectedCustomer,
+    selectedVendor,
+    setSelectedVendor,
     selectedExpense,
     setSelectedExpense,
-    
+
     // Loading states
     loadingInvoices,
     loadingCustomers,
@@ -614,10 +781,17 @@ export function useBooksDataManagement(organizationId: string | null, isConnecte
     handleCreateCustomer,
     handleCreateVendor,
     handleCreateExpense,
+    handleViewInvoice,
+    handleUpdateInvoice,
+    handleDeleteInvoice,
+    handleViewCustomer,
+    handleUpdateCustomer,
     handleViewExpense,
     handleUpdateExpense,
     handleDeleteExpense,
     handleDeleteCustomer,
+    handleViewVendor,
+    handleUpdateVendor,
     handleDeleteVendor,
   };
 }

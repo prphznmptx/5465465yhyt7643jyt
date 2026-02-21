@@ -13,6 +13,9 @@ import NewInvoiceModal from '../components/NewInvoiceModal';
 import NewCustomerModal from '../components/NewCustomerModal';
 import NewVendorModal from '../components/NewVendorModal';
 import NewExpenseModal from '../components/NewExpenseModal';
+import InvoiceDetailModal from '../components/InvoiceDetailModal';
+import CustomerDetailModal from '../components/CustomerDetailModal';
+import VendorDetailModal from '../components/VendorDetailModal';
 import ExpenseDetailModal from '../components/ExpenseDetailModal';
 import DashboardTab from '../components/DashboardTab';
 import InvoicesTab from '../components/InvoicesTab';
@@ -44,6 +47,12 @@ export default function Books() {
     expenses,
     expenseAccounts,
     reports,
+    selectedInvoice,
+    setSelectedInvoice,
+    selectedCustomer,
+    setSelectedCustomer,
+    selectedVendor,
+    setSelectedVendor,
     selectedExpense,
     setSelectedExpense,
     loadingInvoices,
@@ -62,10 +71,17 @@ export default function Books() {
     handleCreateCustomer: createCustomerHandler,
     handleCreateVendor: createVendorHandler,
     handleCreateExpense: createExpenseHandler,
+    handleViewInvoice: viewInvoiceHandler,
+    handleUpdateInvoice: updateInvoiceHandler,
+    handleDeleteInvoice: deleteInvoiceHandler,
+    handleViewCustomer: viewCustomerHandler,
+    handleUpdateCustomer: updateCustomerHandler,
     handleViewExpense: viewExpenseHandler,
     handleUpdateExpense: updateExpenseHandler,
     handleDeleteExpense: deleteExpenseHandler,
     handleDeleteCustomer: deleteCustomerHandler,
+    handleViewVendor: viewVendorHandler,
+    handleUpdateVendor: updateVendorHandler,
     handleDeleteVendor: deleteVendorHandler,
   } = useBooksDataManagement(organizationId, isConnected);
 
@@ -75,6 +91,9 @@ export default function Books() {
   const [showNewCustomerModal, setShowNewCustomerModal] = useState(false);
   const [showNewVendorModal, setShowNewVendorModal] = useState(false);
   const [showNewExpenseModal, setShowNewExpenseModal] = useState(false);
+  const [showInvoiceDetailModal, setShowInvoiceDetailModal] = useState(false);
+  const [showCustomerDetailModal, setShowCustomerDetailModal] = useState(false);
+  const [showVendorDetailModal, setShowVendorDetailModal] = useState(false);
   const [showExpenseDetailModal, setShowExpenseDetailModal] = useState(false);
 
   // Form states
@@ -315,9 +334,9 @@ export default function Books() {
             invoices={invoices}
             isLoading={loadingInvoices}
             onNewClick={() => setShowNewInvoiceModal(true)}
-            onView={(invoiceId) => console.log('View invoice:', invoiceId)}
-            onEdit={(invoiceId) => console.log('Edit invoice:', invoiceId)}
-            onDelete={(invoiceId) => console.log('Delete invoice:', invoiceId)}
+            onView={viewInvoiceHandler}
+            onUpdate={updateInvoiceHandler}
+            onDelete={deleteInvoiceHandler}
           />
         )}
 
@@ -328,8 +347,8 @@ export default function Books() {
             isLoading={loadingCustomers}
             onNewClick={() => setShowNewCustomerModal(true)}
             onDelete={deleteCustomerHandler}
-            onView={(customer) => console.log('View customer:', customer)}
-            onEdit={(customer) => console.log('Edit customer:', customer)}
+            onView={viewCustomerHandler}
+            onUpdate={updateCustomerHandler}
           />
         )}
 
@@ -340,8 +359,8 @@ export default function Books() {
             isLoading={loadingVendors}
             onNewClick={() => setShowNewVendorModal(true)}
             onDelete={deleteVendorHandler}
-            onView={(vendor) => console.log('View vendor:', vendor)}
-            onEdit={(vendor) => console.log('Edit vendor:', vendor)}
+            onView={viewVendorHandler}
+            onUpdate={updateVendorHandler}
           />
         )}
 
@@ -423,6 +442,30 @@ export default function Books() {
           expenseAccounts={expenseAccounts}
           isSaving={savingExpense}
           isLoading={loadingExpenses}
+        />
+
+        <InvoiceDetailModal
+          isOpen={showInvoiceDetailModal}
+          onClose={() => setShowInvoiceDetailModal(false)}
+          invoice={selectedInvoice}
+          onDelete={deleteInvoiceHandler}
+          onUpdate={updateInvoiceHandler}
+        />
+
+        <CustomerDetailModal
+          isOpen={showCustomerDetailModal}
+          onClose={() => setShowCustomerDetailModal(false)}
+          customer={selectedCustomer}
+          onDelete={deleteCustomerHandler}
+          onUpdate={updateCustomerHandler}
+        />
+
+        <VendorDetailModal
+          isOpen={showVendorDetailModal}
+          onClose={() => setShowVendorDetailModal(false)}
+          vendor={selectedVendor}
+          onDelete={deleteVendorHandler}
+          onUpdate={updateVendorHandler}
         />
 
         <ExpenseDetailModal
